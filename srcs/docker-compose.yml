@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mariadb:
     build:
@@ -18,6 +16,25 @@ services:
     networks:
       - inception_network
 
+  wordpress:
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    image: wordpress
+    container_name: wordpress
+    restart: always
+    depends_on:
+      - mariadb
+    env_file:
+      - .env
+    secrets:
+      - db_password
+      - credentials
+    volumes:
+      - wordpress_data:/var/www/wordpress
+    networks:
+      - inception_network
+
 volumes:
   mariadb_data:
     driver: local
@@ -25,6 +42,12 @@ volumes:
       type: none
       o: bind
       device: /home/vpushkar/data/mariadb
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/vpushkar/data/wordpress
 
 networks:
   inception_network:
@@ -35,3 +58,5 @@ secrets:
     file: ../secrets/db_root_password.txt
   db_password:
     file: ../secrets/db_password.txt
+  credentials:
+    file: ../secrets/credentials.txt
