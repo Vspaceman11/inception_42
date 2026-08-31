@@ -3,8 +3,8 @@ set -e
 
 # Read secrets
 MYSQL_PASSWORD=$(cat /run/secrets/db_password)
-WP_ADMIN_PASSWORD=$(cat /run/secrets/credentials)
-WP_USER_PASSWORD=$(cat /run/secrets/credentials)
+WP_ADMIN_PASSWORD=$(cat /run/secrets/wp_admin_password)
+WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password)
 
 # Wait when MariaDB will be ready to recive connections
 echo "Waiting for MariaDB..."
@@ -47,6 +47,10 @@ if [ ! -f /var/www/wordpress/wp-config.php ]; then
         --user_pass="$WP_USER_PASSWORD" \
         --role=author \
         --allow-root
+
+    # Ensure Site URLs use HTTPS protocol in database
+    wp option update siteurl "https://$DOMAIN_NAME" --allow-root
+    wp option update home "https://$DOMAIN_NAME" --allow-root
 
     echo "WordPress configured successfully!"
 fi

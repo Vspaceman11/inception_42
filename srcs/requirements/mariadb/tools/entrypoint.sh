@@ -10,18 +10,22 @@ chown -R mysql:mysql /var/lib/mysql
 MYSQL_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
 MYSQL_PASSWORD=$(cat /run/secrets/db_password)
 
-# Check is DB initialised
+# Check if DB is initialized (проверяем именно папку создаваемой базы)
 if [ ! -d "/var/lib/mysql/$MYSQL_DATABASE" ]; then
     echo "Initializing MariaDB database..."
 
+    # First system tables installation
     mysql_install_db --user=mysql --datadir=/var/lib/mysql > /dev/null
 
+    # First installation through --bootstrap
     mysqld --user=mysql --bootstrap <<EOF
 USE mysql;
 FLUSH PRIVILEGES;
 
+# Install root password
 ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';
 
+# Create DB and user for WordPress
 CREATE DATABASE IF NOT EXISTS \`$MYSQL_DATABASE\`;
 CREATE USER IF NOT EXISTS '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';
 GRANT ALL PRIVILEGES ON \`$MYSQL_DATABASE\`.* TO '$MYSQL_USER'@'%';
@@ -31,5 +35,5 @@ EOF
     echo "Database created successfully!"
 fi
 
-# Run MariaDB in standart mode (PID 1)
+# Run MariaDB in standard mode (PID 1)
 exec mysqld --user=mysql
