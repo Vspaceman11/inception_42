@@ -10,7 +10,7 @@ chown -R mysql:mysql /var/lib/mysql
 MYSQL_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
 MYSQL_PASSWORD=$(cat /run/secrets/db_password)
 
-# Check if DB is initialized (проверяем именно папку создаваемой базы)
+# Check if DB is initialized
 if [ ! -d "/var/lib/mysql/$MYSQL_DATABASE" ]; then
     echo "Initializing MariaDB database..."
 
