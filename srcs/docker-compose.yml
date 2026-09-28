@@ -4,6 +4,12 @@ services:
     build: requirements/mariadb
     container_name: mariadb
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -u\"$$MYSQL_USER\" -p\"$$(cat /run/secrets/db_password)\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     env_file:
       - .env
     secrets:
@@ -20,7 +26,8 @@ services:
     container_name: wordpress
     restart: always
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
     env_file:
       - .env
     secrets:

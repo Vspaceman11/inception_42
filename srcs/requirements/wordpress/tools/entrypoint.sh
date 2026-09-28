@@ -8,8 +8,15 @@ WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password)
 
 # Wait when MariaDB will be ready to recive connections
 echo "Waiting for MariaDB..."
+attempt=1
+max_attempts=30
 while ! mariadb -hmariadb -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e "SELECT 1;" >/dev/null 2>&1; do
+    if [ "$attempt" -ge "$max_attempts" ]; then
+        echo "MariaDB did not become ready after $max_attempts attempts."
+        exit 1
+    fi
     sleep 2
+    attempt=$((attempt + 1))
 done
 echo "MariaDB is ready!"
 
