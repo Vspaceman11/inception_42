@@ -62,6 +62,12 @@ if [ ! -f /var/www/wordpress/wp-config.php ]; then
     echo "WordPress configured successfully!"
 fi
 
+# Keep WordPress links on the same host and port as the current HTTPS request.
+wp_home_expression="'https://' . (isset(\$_SERVER['HTTP_HOST']) ? \$_SERVER['HTTP_HOST'] : '$DOMAIN_NAME')"
+sed -i "/define( 'WP_HOME'/d; /define( 'WP_SITEURL'/d" /var/www/wordpress/wp-config.php
+wp config set WP_HOME "$wp_home_expression" --raw --allow-root
+wp config set WP_SITEURL "$wp_home_expression" --raw --allow-root
+
 # Install right files owner
 chown -R www-data:www-data /var/www/wordpress
 

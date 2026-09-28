@@ -187,10 +187,10 @@ The cleanup is limited to this Compose project: its containers, locally built im
 
 Compose creates the `inception_network` bridge network. Docker DNS provides service names:
 
-- WordPress connects to MariaDB at `mariadb:3306`.
-- NGINX connects to PHP-FPM at `wordpress:9000`.
 
 Neither MariaDB nor PHP-FPM is published to the host. NGINX is the only public entry point on port 443.
+
+WordPress defines `WP_HOME` and `WP_SITEURL` from the incoming HTTPS `Host` header. This keeps generated links, CSS, JavaScript, and login redirects on the current host port. Therefore, during a configuration test such as `8443:443`, the site remains usable at `https://vpushkar.42.fr:8443` without manually editing the database URLs.
 
 Inspect the network:
 
