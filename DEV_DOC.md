@@ -74,7 +74,7 @@ The secret directory and `srcs/.env` are ignored by Git. Never commit them or pl
         └── wordpress/
 ```
 
-Each service has its own Dockerfile. The Compose file builds the images, creates the bridge network, attaches the volumes, and publishes only NGINX port 443.
+Each service has its own Dockerfile. The Compose file builds the images, creates the bridge network, attaches the volumes, and publishes only NGINX port 443. The locally built images use the explicit tags `mariadb:inception`, `wordpress:inception`, and `nginx:inception`; no implicit `latest` tag is used.
 
 ## Build and launch
 
@@ -110,6 +110,8 @@ Check service status:
 ```bash
 docker compose -f srcs/docker-compose.yml ps
 ```
+
+MariaDB has a Docker healthcheck. WordPress depends on MariaDB becoming healthy and also checks the SQL connection before installing WordPress. If MariaDB does not become ready, the bounded WordPress check exits and Docker can restart the service because `restart: always` is configured.
 
 Show logs:
 
@@ -177,7 +179,9 @@ Data persists when containers are removed because it is stored in the host direc
 5. Reboot the virtual machine.
 6. Run `make up` and check the website again.
 
-`make fclean` removes Docker resources and deletes the contents of both host data directories. It is destructive and should be used only for a clean reset.
+`make fclean` removes this Compose project's Docker resources and deletes the contents of both host data directories. It is destructive and should be used only for a clean reset.
+
+The cleanup is limited to this Compose project: its containers, locally built images, network, and volumes. It does not remove Docker resources belonging to other projects.
 
 ## Network and service connections
 

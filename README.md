@@ -51,6 +51,8 @@ The containers use the same private Docker network, but MariaDB and WordPress ar
 - Host-backed volumes preserve WordPress files and MariaDB data after container recreation.
 - Services run their real foreground daemon as PID 1. The entrypoint scripts use `exec` instead of an artificial background process.
 
+The images are built locally from the project Dockerfiles and use explicit `inception` tags: `mariadb:inception`, `wordpress:inception`, and `nginx:inception`. This avoids the prohibited implicit `latest` tag.
+
 ### Virtual machines vs Docker
 
 A virtual machine emulates or virtualizes a complete computer. It runs a guest operating system with its own kernel. This provides strong isolation, but each virtual machine needs its own operating system, memory, storage, and boot process.
@@ -141,6 +143,8 @@ make up
 ```
 
 `make re` performs a full reset and deletes the contents of the WordPress and MariaDB data directories. Use it only when a clean installation is required.
+
+The cleanup commands are scoped to this Compose project and do not remove Docker resources belonging to unrelated projects.
 
 ## Resources
 
